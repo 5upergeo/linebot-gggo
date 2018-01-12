@@ -8,8 +8,7 @@ module.exports.getYtchSubscription = getYtchSubscription;
 module.exports.poYtch = poYtch;
 module.exports.getYtch = getYtch;
 module.exports.getYtchByUserId = getYtchByUserId;
-
-
+module.exports.getNBATop10U = getNBATop10U;
 
 function getYtchList() {
   return new Promise((resolve, reject) => {
@@ -91,6 +90,16 @@ function getYtchByUserId(id) {
 function getYtch(id) {
   return new Promise((resolve, reject) => {
     const query = `SELECT CHANNEL_ID, CHANNEL_NAME, CHANNEL_NAME_ZH FROM ytChannel WHERE CHANNEL_ID = '${id}'`;
+    conn.query(query, (err, results) => {
+      if (err) reject(err);
+      resolve(results);
+    });
+  });
+}
+
+function getNBATop10U() {
+  return new Promise((resolve, reject) => {
+    const query = 'SELECT USER_ID FROM nbaTop10';
     conn.query(query, (err, results) => {
       if (err) reject(err);
       resolve(results);

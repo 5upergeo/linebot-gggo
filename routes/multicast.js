@@ -2,7 +2,7 @@ const linebot = require("linebot");
 const request = require("request");
 const moment = require("moment");
 const { botconfig, ytkey } = require("../config");
-const { getYtchSubscription } = require("../assets/dbTool");
+const { getYtchSubscription, getNBATop10U } = require("../assets/dbTool");
 
 const bot = linebot(botconfig);
 
@@ -35,41 +35,50 @@ function top10(timeLag) {
         if (!upload) {
           return;
         }
-        bot.multicast(
-          ["U664b2ed942423006a6935237e790b641", "U7083fbe43e5df686e6d349bdf80f4616", "U10f7463f4cbe51e288ed2ad2889884b6"],
-          [
-            {
-              type: "text",
-              text: `${upload.snippet
-                .title}\nhttps://www.youtube.com/watch?v=${upload.contentDetails
-                .upload.videoId}`
-            },
-            {
-              type: "template",
-              altText: "o(^▽^)o",
-              template: {
-                type: "carousel",
-                columns: [
-                  {
-                    thumbnailImageUrl: upload.snippet.thumbnails.medium.url,
-                    imageBackgroundColor: "#FFFFFF",
-                    text: upload.snippet.title.slice(0, 40),
-                    actions: [
-                      {
-                        type: "uri",
-                        label: "前往",
-                        uri: `https://www.youtube.com/watch?v=${upload
-                          .contentDetails.upload.videoId}`
-                      }
-                    ],
-                    imageAspectRatio: "rectangle",
-                    imageSize: "cover"
-                  }
-                ]
+
+        getNBATop10U()
+          .then(r => {
+            return new Promise((resolve, reject) => {
+              const arr = r.map(g => {
+                return g.USER_ID;
+              });
+              resolve(arr);
+            });
+          })
+          .then(r => {
+            bot.multicast(r, [
+              {
+                type: "text",
+                text: `${upload.snippet
+                  .title}\nhttps://www.youtube.com/watch?v=${upload
+                  .contentDetails.upload.videoId}`
+              },
+              {
+                type: "template",
+                altText: "o(^▽^)o",
+                template: {
+                  type: "carousel",
+                  columns: [
+                    {
+                      thumbnailImageUrl: upload.snippet.thumbnails.medium.url,
+                      imageBackgroundColor: "#FFFFFF",
+                      text: upload.snippet.title.slice(0, 40),
+                      actions: [
+                        {
+                          type: "uri",
+                          label: "前往",
+                          uri: `https://www.youtube.com/watch?v=${upload
+                            .contentDetails.upload.videoId}`
+                        }
+                      ],
+                      imageAspectRatio: "rectangle",
+                      imageSize: "cover"
+                    }
+                  ]
+                }
               }
-            }
-          ]
-        );
+            ]);
+          });
       } catch (err) {
         console.error(err);
       }
