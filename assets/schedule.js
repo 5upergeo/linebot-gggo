@@ -1,16 +1,14 @@
 const schedule = require("node-schedule");
-const {joeman, top10, howfun, LatestVideo} = require("../routes/multicast");
+const {top10, LatestVideo} = require("../routes/multicast");
 
-// joeman();
-// top10();
-// howfun();
-LatestVideo();
+const timeLag = 60*60*1000
+
+top10(timeLag);
+LatestVideo(timeLag);
 setInterval(()=>{
-    // joeman();
-    // top10();
-    // howfun();
-    LatestVideo();
-}, 60*60*1000)
+    top10();
+    LatestVideo(timeLag);
+}, timeLag)
 // var j = schedule.scheduleJob("30 * * * * *", function() {
 //   top10();
 // });
